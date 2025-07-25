@@ -1,0 +1,13 @@
+# Stripe Invoice Delay Logic/.dockerignore
+node_modules
+npm-debug.log
+.git
+.github
+.vscode
+*.md
+.gitignore
+.eslintrc
+.prettierrc
+test
+coverage
+.env.yml

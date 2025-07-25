@@ -1,0 +1,66 @@
+# Stripe Invoice Delay Logic/.github/workflows/ci.yml
+
+name: Stripe Invoice Delay Logic CI
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint & Fix
+        run: npm run lint
+
+      - name: Run Jest tests
+        run: npm test
+
+      - name: Run validate-config tests
+        run: npx ts-node src/tools/validate-config.test.ts
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+
+      - name: Build Docker image
+        run: |
+          docker build -t stripe-invoice-delay:${{ github.sha }} .
+          docker tag stripe-invoice-delay:${{ github.sha }} stripe-invoice-delay:latest
+
+      # Здесь можно добавить шаг для отправки образа в Docker registry
+      # - name: Push Docker image
+      #   run: |
+      #     echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+      #     docker push stripe-invoice-delay:${{ github.sha }}
+      #     docker push stripe-invoice-delay:latest
