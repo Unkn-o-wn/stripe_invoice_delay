@@ -6,6 +6,11 @@ import { getUnixTime } from 'date-fns';
 import { getLoggerToken } from 'nestjs-pino';
 import Stripe from 'stripe';
 import { StripeManagerService } from './stripe-manager.service';
+jest.mock('@/configs', () => ({
+  StripeConfig: {
+    KEY: 'STRIPE_CONFIG',
+  },
+}));
 
 describe('StripeManagerService', () => {
   let service: StripeManagerService;
