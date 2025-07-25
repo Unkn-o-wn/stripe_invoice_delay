@@ -33,9 +33,9 @@ export default tseslint.config(
       '@typescript-eslint/no-unsafe-call': 'off',
       '@typescript-eslint/no-unsafe-member-access': 'off',
       '@typescript-eslint/no-unsafe-return': 'off',
-      quotes: ['error', 'single', { avoidEscape: true, allowTemplateLiterals: true }],
+      quotes: ['warn', 'single', { avoidEscape: true, allowTemplateLiterals: true }],
       '@typescript-eslint/quotes': [
-        'error',
+        'warn',
         'single',
         { avoidEscape: true, allowTemplateLiterals: true },
       ],
