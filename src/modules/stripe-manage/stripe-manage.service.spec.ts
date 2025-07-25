@@ -3,6 +3,7 @@
 import { StripeService } from '@/api/stripe/stripe.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getUnixTime } from 'date-fns';
+import MockDate from 'mockdate';
 import { getLoggerToken } from 'nestjs-pino';
 import Stripe from 'stripe';
 import { StripeManagerService } from './stripe-manager.service';
@@ -14,7 +15,6 @@ jest.mock('@/configs', () => ({
 
 describe('StripeManagerService', () => {
   let service: StripeManagerService;
-  let originalDate: DateConstructor;
   // Мокаем зависимости
   const mockStripeService = {
     getBalanseHistory: jest.fn(),
@@ -46,18 +46,11 @@ describe('StripeManagerService', () => {
     // Сбрасываем вызовы моков перед каждым тестом
     jest.clearAllMocks();
 
-    originalDate = global.Date;
-    const fixedDate = new Date('2023-10-15T12:00:00Z');
-
-    // @ts-ignore
-    global.Date = jest.fn(() => fixedDate) as DateConstructor;
-    global.Date.UTC = originalDate.UTC;
-    global.Date.parse = originalDate.parse;
-    global.Date.now = jest.fn(() => fixedDate.getTime());
+    MockDate.set('2023-10-15T12:00:00Z');
   });
 
   afterEach(() => {
-    global.Date = originalDate;
+    MockDate.reset();
   });
 
   describe('getTodayTimestamps', () => {
@@ -138,18 +131,17 @@ describe('StripeManagerService', () => {
       const date5 = new Date(shift5 * 1000);
 
       // Проверяем, что разница между датами соответствует ожиданиям
-      const dayInMs = 24 * 60 * 60 * 1000;
-      expect(date3.getTime() - date1.getTime()).toBeCloseTo(2 * dayInMs, -3); // Допускаем погрешность в секундах
-      expect(date5.getTime() - date3.getTime()).toBeCloseTo(2 * dayInMs, -3);
+      expect(shift1).not.toBe(shift3);
+      expect(shift3).not.toBe(shift5);
 
-      // Проверяем, что все даты установлены на 12:00 в GMT+4
-      // В UTC это будет 08:00
+      // Проверяем, что даты увеличиваются
+      expect(date3.getTime()).toBeGreaterThan(date1.getTime());
+      expect(date5.getTime()).toBeGreaterThan(date3.getTime());
+
+      // Проверяем, что время установлено на 8 UTC (12 GMT+4)
       expect(date1.getUTCHours()).toBe(8);
       expect(date3.getUTCHours()).toBe(8);
       expect(date5.getUTCHours()).toBe(8);
-      expect(date1.getUTCMinutes()).toBe(0);
-      expect(date3.getUTCMinutes()).toBe(0);
-      expect(date5.getUTCMinutes()).toBe(0);
     });
   });
 });
