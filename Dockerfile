@@ -14,7 +14,7 @@ COPY nest-cli.json ./
 
 # Определяем переменные среды
 ENV NODE_ENV=production
-ENV PORT=3000
+ENV PORT=8080
 
 # Открываем порт
 EXPOSE ${PORT}
