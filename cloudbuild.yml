@@ -1,0 +1,37 @@
+---
+#-----------------------------------------
+# CloudBuild Pipeline for Prod CloudRun
+#-----------------------------------------
+steps:
+  # Docker Build Image
+  - name: gcr.io/cloud-builders/docker
+    id: BUILD
+    args: ['build', '-t', '$_SERVICE_IMAGE', '.', '-f', 'Dockerfile']
+
+  # Docker Push Image to Artifact Registry
+  - name: gcr.io/cloud-builders/docker
+    id: PUSH
+    args: ['push', '$_SERVICE_IMAGE']
+
+  # Docker Deploy image to Cloud Run
+  - name: gcr.io/cloud-builders/gcloud
+    id: DEPLOY
+    args:
+      - run
+      - services
+      - update
+      - $_SERVICE_NAME
+      - --project=$_SERVICE_PROJECT
+      - --region=$_SERVICE_REGION
+      - --image=$_SERVICE_IMAGE
+
+images: # Display the image in the build results - Build Artifacts
+  - $_SERVICE_IMAGE
+
+substitutions:
+  _SERVICE_IMAGE: http://europe-north2-docker.pkg.dev/${PROJECT_ID}/${_DOCKER_REGISTRY}/${}:${SHORT_SHA} northamerica-northeast1-docker.pkg.dev/${PROJECT_ID}/${_DOCKER_REGISTRY}/${_DOCKER_IMAGENAME}
+  _SERVICE_REGION: eu-north2
+  _SERVICE_PROJECT: stripe-invoice-delay
+  _SERVICE_NAME: stripe-invoice-delay-run
+  _DOCKER_REGISTRY: man-docker-repo
+  _DOCKER_IMAGENAME: stripe-invoice-delay
