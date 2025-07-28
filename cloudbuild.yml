@@ -2,6 +2,11 @@
 #-----------------------------------------
 # CloudBuild Pipeline for Prod CloudRun
 #-----------------------------------------
+#
+#
+options:
+  logging: CLOUD_LOGGING_ONLY
+
 steps:
   # Docker Build Image
   - name: gcr.io/cloud-builders/docker
