@@ -103,7 +103,9 @@ export class StripeManagerService {
     try {
       let shiftDays = 1;
       for (const invoice of invoices) {
-        if (!invoice || !invoice.id) continue;
+        if (!invoice || !invoice.id) {
+          continue;
+        }
         const updatedInvoice = await this.stripeService.updateInvoice({
           invoiceId: invoice.id,
           dueDate: this.getNewDueDate(shiftDays),
