@@ -1,7 +1,6 @@
 import { StripeService } from '@/api/stripe/stripe.service';
 import { InvoiceStatus } from '@/api/stripe/types/get-invoices';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
 import {
   addDays,
   endOfDay,
@@ -23,23 +22,6 @@ export class StripeManagerService {
     private readonly stripeService: StripeService,
     @InjectPinoLogger(StripeManagerService.name) private readonly logger: PinoLogger,
   ) {}
-
-  @Cron('0 23 * * *', {
-    utcOffset: 4,
-  })
-  async scheduledInvoiceDelayCheck() {
-    this.logger.info('Running scheduled invoice delay check');
-    try {
-      await this.processInvoiceDelays();
-      this.logger.info('Scheduled invoice delay check completed successfully');
-    } catch (error) {
-      this.logger.error(
-        // @ts-expect-error
-        { error: error.message, stack: error.stack },
-        'Error in scheduled invoice delay check',
-      );
-    }
-  }
 
   async processInvoiceDelays(): Promise<void> {
     this.logger.info('Starting invoice delay process');

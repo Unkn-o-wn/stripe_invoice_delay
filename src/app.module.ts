@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { ScheduleModule } from '@nestjs/schedule';
 import { LoggerModule } from 'nestjs-pino';
 import { StripeModule } from './api/stripe/stripe.module';
 import * as configs from './configs';
@@ -30,7 +29,6 @@ import { StripeManagerModule } from './modules/stripe-manage/stripe-manager.modu
       isGlobal: true,
       load: Object.values(configs),
     }),
-    ScheduleModule.forRoot(),
     StripeModule,
     StripeManagerModule,
   ],
