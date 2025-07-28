@@ -51,12 +51,11 @@ export class StripeService {
 
     let hasMore = opts.needAll;
     let startingAfterDraftInvoices: string | undefined;
-    let startingAfteropenInvoices: string | undefined;
     const allInvoices: Stripe.Invoice[] = [];
     do {
       try {
         // @Todo: refactor
-        const [draftInvoices, openInvoices] = await Promise.all([
+        const [draftInvoices] = await Promise.all([
           this.stripe.invoices.list({
             limit: 100,
             created: {
@@ -66,27 +65,18 @@ export class StripeService {
             status: InvoiceStatus.DRAFT,
             ...(startingAfterDraftInvoices ? { starting_after: startingAfterDraftInvoices } : {}),
           }),
-          this.stripe.invoices.list({
-            limit: 100,
-            created: {
-              gte: opts.start,
-              lte: opts.end,
-            },
-            status: InvoiceStatus.OPEN,
-            ...(startingAfteropenInvoices ? { starting_after: startingAfteropenInvoices } : {}),
-          }),
         ]);
 
-        allInvoices.push(...[...draftInvoices.data, ...openInvoices.data]);
-        hasMore = draftInvoices.has_more ? draftInvoices.has_more : openInvoices.has_more;
+        allInvoices.push(...[...draftInvoices.data]);
+        hasMore = draftInvoices.has_more ? draftInvoices.has_more : false;
         startingAfterDraftInvoices =
           draftInvoices.data.length > 0
             ? draftInvoices.data[draftInvoices.data.length - 1].id
             : undefined;
-        startingAfteropenInvoices =
-          openInvoices.data.length > 0
-            ? openInvoices.data[openInvoices.data.length - 1].id
-            : undefined;
+        // startingAfteropenInvoices =
+        //   openInvoices.data.length > 0
+        //     ? openInvoices.data[openInvoices.data.length - 1].id
+        //     : undefined;
       } catch (error) {
         throw new InternalServerErrorException({
           message: 'Failed to fetch invoices',
