@@ -29,10 +29,10 @@ export class StripeManagerService {
       const datePeriod = this.getTodayTimestamps();
       const dailyGrossVolume = await this.getDailyGrossVolume(datePeriod);
 
-      if (dailyGrossVolume >= 30) {
-        const unpaidInvoices = await this.getUnpaidInvoices(datePeriod);
-        await this.delayInvoices(unpaidInvoices);
-      }
+      // if (dailyGrossVolume >= 30) {
+      //   const unpaidInvoices = await this.getUnpaidInvoices(datePeriod);
+      //   await this.delayInvoices(unpaidInvoices);
+      // }
       this.logger.info('Invoice delay process completed');
     } catch (error) {
       throw new InternalServerErrorException({
@@ -48,6 +48,7 @@ export class StripeManagerService {
         ...datePeriod,
         needAll: false,
       });
+      console.log(paymentIntents);
 
       return this.calculateVolumes(paymentIntents);
     } catch (error) {
@@ -75,9 +76,9 @@ export class StripeManagerService {
     let netVolume = 0;
     for await (const txn of transactions) {
       if (txn.type === 'charge') {
-        totalVolume += txn.amount;
+        totalVolume += txn.amount / 100;
       }
-      netVolume += txn.amount;
+      netVolume += txn.amount / 100;
     }
 
     return totalVolume;
