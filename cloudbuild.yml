@@ -34,7 +34,7 @@ images: # Display the image in the build results - Build Artifacts
   - $_SERVICE_IMAGE
 
 substitutions:
-  _SERVICE_IMAGE: http://europe-north2-docker.pkg.dev/${PROJECT_ID}/${_DOCKER_REGISTRY}/${_DOCKER_IMAGENAME}:${SHORT_SHA}
+  _SERVICE_IMAGE: europe-north2-docker.pkg.dev/${PROJECT_ID}/${_DOCKER_REGISTRY}/${_DOCKER_IMAGENAME}:${SHORT_SHA}
   _SERVICE_REGION: eu-north2
   _SERVICE_PROJECT: stripe-invoice-delay
   _SERVICE_NAME: stripe-invoice-delay-run
